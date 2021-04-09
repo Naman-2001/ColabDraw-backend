@@ -10,6 +10,10 @@ io.on("connection", (socket) => {
   socket.on("canvas-data", (data) => {
     socket.broadcast.emit("canvas-data", data);
   });
+
+  socket.on("clear", () => {
+    socket.broadcast.emit("clear");
+  });
 });
 
 const port = process.env.PORT || 5000;
