@@ -1,6 +1,7 @@
 const app = require("express")();
 const http = require("http").createServer(app);
 const io = require("socket.io")(http);
+const console = require("console");
 const cors = require("cors");
 
 app.use(cors());
@@ -25,6 +26,7 @@ io.on("connection", (socket) => {
 
   socket.on("join", (data, callback) => {
     socket.emit("cid", socket.id);
+    console.log(data);
     const { error, user } = addUser({
       id: socket.id,
       data: data,
@@ -51,6 +53,13 @@ io.on("connection", (socket) => {
     io.to(user.roomID).emit("message", { user, text: message, type: "genz" });
 
     callback();
+  });
+
+  socket.on("draw", (drawing) => {
+    const user = getUser(socket.id);
+    console.log(user);
+    io.to(user.roomID).emit("draw", { newOps: [drawing] });
+    // callback();
   });
 
   socket.on("language-change", (props) => {
@@ -89,7 +98,7 @@ io.on("connection", (socket) => {
   });
 });
 
-const port = process.env.PORT || 5000;
+const port = process.env.PORT || 5001;
 http.listen(port, () => {
   console.log("server started on ", port);
 });
